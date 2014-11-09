@@ -22,15 +22,20 @@ end
 
 # Heroku controls what database we connect to by setting the DATABASE_URL environment variable
 # We need to respect that if we want our Sinatra apps to run on Heroku without modification
-db = URI.parse(ENV['DATABASE_URL'] || "postgres://localhost/#{APP_NAME}_#{Sinatra::Application.environment}")
 
+# POSTGRES USE
+db = URI.parse(ENV['DATABASE_URL'] || "postgres://localhost/#{APP_NAME}_#{Sinatra::Application.environment}")
 DB_NAME = db.path[1..-1]
+
+# SQLITE# USE
+SDB_NAME = APP_ROOT.join('db', APP_NAME + ".db" ).to_s
 
 # Note:
 #   Sinatra::Application.environment is set to the value of ENV['RACK_ENV']
 #   if ENV['RACK_ENV'] is set.  If ENV['RACK_ENV'] is not set, it defaults
 #   to :development
 
+# POSTGRES USE
 ActiveRecord::Base.establish_connection(
   :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
   :host     => db.host,
@@ -40,3 +45,9 @@ ActiveRecord::Base.establish_connection(
   :database => DB_NAME,
   :encoding => 'utf8'
 )
+
+# SQLITE 3 USE
+# ActiveRecord::Base.establish_connection(
+#   :adapter => "sqlite3",
+#   :database  => SDB_NAME
+# )
